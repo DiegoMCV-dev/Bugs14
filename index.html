@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Solo foto - Responsiva</title>
+  <style>
+    :root{ --bg:#0b0b0b }
+    html,body{ height:100%; margin:0 }
+    body{
+      background:var(--bg);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color:#fff;
+    }
+
+    .photo-wrap{
+      width:100%;
+      max-width:1200px; /* ancho máximo en pantallas grandes */
+      height:auto;
+      padding:10px;
+      box-sizing:border-box;
+    }
+
+    img.photo{
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      border-radius:12px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.6);
+      transition:transform .35s ease, box-shadow .35s ease;
+      cursor:zoom-in;
+      background:#111;
+      display:block;
+      margin:0 auto;
+    }
+
+    img.zoomed{
+      transform:scale(1.03);
+      box-shadow:0 20px 60px rgba(0,0,0,0.75);
+      cursor:zoom-out;
+    }
+
+    .hint{
+      position:fixed;
+      left:12px;
+      bottom:12px;
+      background:rgba(255,255,255,0.06);
+      padding:8px 10px;
+      border-radius:8px;
+      font-size:13px;
+      backdrop-filter:blur(4px);
+    }
+
+    @media (max-width:768px){
+      .photo-wrap{ padding:8px }
+      img.photo{ border-radius:10px }
+      .hint{ font-size:12px }
+    }
+
+    @media (max-width:480px){
+      .photo-wrap{ padding:5px }
+      img.photo{ border-radius:8px }
+      .hint{ font-size:11px; padding:6px 8px }
+    }
+  </style>
+</head>
+<body>
+  <div class="photo-wrap" id="wrap">
+    <img id="mainPhoto" class="photo" src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1600&auto=format&fit=crop" alt="Foto principal">
+  </div>
+
+  <div class="hint">Haz click en la imagen para ampliar — Esc para salir</div>
+
+  <script>
+    const img = document.getElementById('mainPhoto');
+    const wrap = document.getElementById('wrap');
+
+    img.addEventListener('click', async () => {
+      const isZoomed = img.classList.toggle('zoomed');
+
+      try{
+        if (isZoomed) {
+          if (wrap.requestFullscreen) await wrap.requestFullscreen();
+          else if (wrap.webkitRequestFullscreen) await wrap.webkitRequestFullscreen();
+        } else {
+          if (document.fullscreenElement) await document.exitFullscreen();
+        }
+      }catch(e){ }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) img.classList.remove('zoomed');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        img.classList.remove('zoomed');
+        if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+      }
+    });
+  </script>
+</body>
+</html>
